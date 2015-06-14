@@ -1,0 +1,5 @@
+-When there is a change in the table, we should check if the new date is more recent than the old one. This
+                                                                    would provide another error-proof level.
+-Make the error system more spesific to the url the problem occurred in.
+-If something is empty in the table do not send message.
+-If there is an error send messages to the list.

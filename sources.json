@@ -1,0 +1,108 @@
+{
+    "ios beta": {
+        "format": "iOS\\s(.+?)\\sbeta\\s(.+?)\\s+.",
+        "link": "https://developer.apple.com/news/rss/news.rss",
+        "soft_name": "iOS",
+        "type": "rss"
+    },
+
+    "ios official": {
+        "link": "https://support.apple.com/en-us/HT201222",
+        "type": "html_table_apple",
+        "format": "iOS.+?(\\d.+?\\d)",
+        "soft_name": "iOS",
+        "date_format": "%d %b %Y"
+
+    },
+
+
+    "selenium": {
+        "link": "http://www.seleniumhq.org/download/",
+        "link2": "http://pypi.python.org/pypi/selenium",
+        "type": "html_table_selenium",
+        "soft_name": "Selenium",
+        "date_format": "%Y-%m-%d"
+
+    },
+    "android": {
+        "link": "http://source.android.com/source/build-numbers.html",
+        "link2": "http://source.android.com/source/build-numbers.html",
+        "type": "html_table_android",
+        "soft_name": "Android",
+        "date_format": "%Y-%m-%d"
+
+    },
+
+    "safari official": {
+        "link": "https://support.apple.com/en-us/HT201222",
+        "type": "html_table_apple",
+        "format": "Safari.+?(\\d.+?\\d)($|,)",
+        "soft_name": "Safari",
+        "date_format": "%d %b %Y"
+
+    },
+    "firefox official": {
+        "format": "data-latest-firefox=\"(.+?)\"",
+        "format2": "first offered to Release channel users on (.+?\\d\\d\\d\\d)",
+        "link": "http://www.mozilla.org/en-US/firefox/releases/",
+        "date_link_beg": "http://www.mozilla.org/en-US/firefox/",
+        "date_link_end": "/releasenotes/",
+        "type": "hidden_in_html_source",
+        "soft_name": "Firefox",
+        "date_format": "%B %d, %Y"
+
+    },
+
+   "chrome official": {
+        "link": "https://omahaproxy.appspot.com/all",
+        "os": "win",
+        "channel": "stable",
+        "type": "csv",
+        "soft_name": "Chrome",
+        "date_format": "%m/%d/%y",
+        "link_download": "https://www.chromium.org/getting-involved/dev-channel"
+
+    },
+
+     "chrome android": {
+        "link": "https://omahaproxy.appspot.com/all",
+        "os": "android",
+        "channel": "stable",
+        "type": "csv",
+        "soft_name": "Chrome browser for android",
+        "date_format": "%m/%d/%y",
+        "link_download": ""
+
+    },
+
+    "chrome webdrive": {
+        "link": "http://chromedriver.storage.googleapis.com/LATEST_RELEASE",
+        "link2": "http://chromedriver.storage.googleapis.com/",
+        "link_download": "http://chromedriver.storage.googleapis.com/index.html?path=",
+        "format": "%Y-%m-%d",
+        "type": "plain_file",
+        "soft_name": "Selenium Chrome webdriver",
+        "date_format": "%B %d, %Y"
+
+    },
+    "ie webdrive": {
+        "link": "http://selenium-release.storage.googleapis.com/",
+        "link_download": "http://selenium-release.storage.googleapis.com/index.html?path=",
+        "format": "%Y-%m-%d",
+        "type": "plain_file_without_latest",
+        "soft_name": "Selenium IE webdriver",
+        "text_format": "IEDriverServer",
+        "date_format": "%B %d, %Y"
+
+    },
+    "selenium folder": {
+        "link": "http://selenium-release.storage.googleapis.com/",
+        "link_download": "http://selenium-release.storage.googleapis.com/index.html?path=",
+        "format": "%Y-%m-%d",
+        "type": "plain_file_without_latest_folder",
+        "soft_name": "Selenium Driver Folder",
+        "text_format": "/",
+        "date_format": "%B %d, %Y"
+
+    }
+}

@@ -1,0 +1,8 @@
+First start mongodb by running:
+sudo mongod
+
+To start the Tornado server:
+python TornadoMain.py
+
+All the sources are described here:
+https://docs.google.com/document/d/18dH6aYSy2JnwKXOvPG0yr9_dU2kzXTkhRTmX5_pYdhs/edit?usp=sharing
