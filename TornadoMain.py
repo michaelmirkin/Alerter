@@ -8,6 +8,7 @@ import datetime
 from time import gmtime, strftime
 from consts import DBURI, HTML_NAME, WAITING_TIME_SEC
 import collections
+import threading
 
 
 class MainHandler(tornado.web.RequestHandler):
@@ -38,15 +39,22 @@ class MainHandler(tornado.web.RequestHandler):
 
         self.render(HTML_NAME, TableStr=tablestr, listFields=self.listfield, today_date=today_str)
 
-
+def create_field_obj(name):
+    return Field(name)
 
 
 
 def check_updates():
     print(strftime("%Y-%m-%d, %H:%M:%S: ", gmtime()) + "Update is now running")
-
+    threads = []
     for name in Field.data_dic:
-        Field(name)
+        t = threading.Thread(target=create_field_obj, args=(name,))
+        t.setDaemon(True)
+        threads.append(t)
+        t.start()
+    for x in threads:
+        x.join()
+
     if Field.load_and_compare():
         print(strftime("%Y-%m-%d, %H:%M:%S: ", gmtime()) + "End of update: There was an update\n")
     else:

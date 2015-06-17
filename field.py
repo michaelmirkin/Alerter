@@ -20,6 +20,7 @@ from collections import OrderedDict
 import unicodedata
 
 
+
 class EmptyField(object):
     """
     A Class that might be cancelled in the future. Is used for returning empty values in the empty table entries.
@@ -291,6 +292,7 @@ class Field(EmptyField):
         Key error is thrown if something has changes or the url is problematic.
         :return:
         """
+        """
         data = {}
         try:
             self.link = self.data_dic[self.name]["link"]
@@ -319,7 +321,31 @@ class Field(EmptyField):
         except Exception as e:
             print(e.message)
             raise KeyError('ERROR: Error reading version or date: ' + self.name)
-
+        """
+        try:
+            link_wiki = self.data_dic[self.name]["link"]
+            html = urllib2.urlopen(link_wiki).read()
+            soup = BeautifulSoup(html)
+            soup.prettify()
+            wiki = {}
+            rows = soup.find_all('table',{"class":"wikitable collapsible"})[-1].find_all('tr')
+            for row in rows:
+                if re.match('\d\.\d', row.contents[1].get_text()):
+                    version = row.contents[1].get_text()
+                    date_string = row.contents[3].get_text()
+                    date_string = unicodedata.normalize('NFKD', date_string).encode('ascii', 'ignore')
+                    date_string = re.match('(\w+?.\d+,.\d\d\d\d)', date_string).group(0)
+                    date_format_wiki = self.data_dic[self.name]["date_format_wiki"]
+                    date = datetime.datetime.strptime(date_string, date_format_wiki)
+                    wiki.update({version: date})
+            last_wiki = max(wiki.iteritems(), key=operator.itemgetter(1))
+            self.version = last_wiki[0]
+            self.date = last_wiki[1]
+            self.link = link_wiki
+            self.generate_table(self.link, self.data_dic[self.name]["link2"])
+        except Exception as e:
+            print(e.message)
+            raise KeyError('ERROR: Error reading version or date: ' + self.name)
 
     def get_data_apple(self):
         """
@@ -367,6 +393,8 @@ class Field(EmptyField):
             getattr(self, self.method)()
 
         except AttributeError as e:
+            if e.message=="'NoneType' object has no attribute 'group'":
+                raise Exception("Error, wrong matching pattern in method: " + self.method)
             raise Exception("Error unknown method: " + self.method + " : " + e.message)
         except KeyError as e:
             if type(e) == KeyError and e.message == "method":
@@ -408,6 +436,7 @@ class Field(EmptyField):
             item = cur.get(k1, [None])
             if item[0] != cls.TableStr[k1][0]:
                 if item[0]:
+                    change = True
                     cls.TableObj[k1].new_release_mail()
                 coll.update({
                 }, {
@@ -415,7 +444,7 @@ class Field(EmptyField):
                         k1: cls.TableStr[k1]
                     }
                 }, upsert=True)
-                change = True
+
         return change
 
 

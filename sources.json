@@ -34,10 +34,11 @@
 
     },
     "android": {
-        "link": "http://source.android.com/source/build-numbers.html",
+        "link": "https://en.wikipedia.org/wiki/Android_version_history",
         "link2": "http://source.android.com/source/build-numbers.html",
         "type": "html_table_android",
         "method": "get_data_android",
+        "date_format_wiki": "%B %d, %Y",
         "soft_name": "Android",
         "is_main_rel": 1,
         "date_format": "%Y-%m-%d"
