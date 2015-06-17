@@ -8,7 +8,6 @@ from bs4 import BeautifulSoup
 import urllib2
 from time import mktime
 from pymongo import MongoClient
-from DictDiffer import DictDiffer
 import smtplib
 from email.mime.text import MIMEText
 import json
@@ -21,39 +20,37 @@ from collections import OrderedDict
 import unicodedata
 
 
-class empty_field(object):
-
+class EmptyField(object):
     """
     A Class that might be cancelled in the future. Is used for returning empty values in the empty table entries.
-    Also is the parent Class of field.
+    Also is the parent Class of Field.
     """
+
     @classmethod
-    def return_date(cls,date):
+    def return_date(cls, date):
         return ''
 
     def new_release_mail(self):
         return
 
 
-class field(empty_field):
-
+class Field(EmptyField):
     # A table (realised through dictionary with values as 2-dim list) containing all the Objects of selected releases.
     with open(JSON_NAME) as data_file:
-        data_dic = json.load(data_file,object_pairs_hook=OrderedDict)
+        data_dic = json.load(data_file, object_pairs_hook=OrderedDict)
 
-
-    TableObj = dict((val["soft_name"], empty_field()) for el,val in
+    TableObj = dict((val["soft_name"], EmptyField()) for el, val in
                     data_dic.iteritems())
 
     # A table (realised through dictionary with values as 2-dim list) containing all the dates (Strings)
     # of selected releases. This is the Table which is written to the DB and creates the HTML file.
-    TableStr = dict((val["soft_name"], ['','','']) for el,val in data_dic.iteritems())
+    TableStr = dict((val["soft_name"], ['', '', '']) for el, val in data_dic.iteritems())
     html_code = ''
     currentYear = datetime.datetime.now().year
 
 
     @classmethod
-    def return_date(cls,date):
+    def return_date(cls, date):
         """
         Returns the date: If the year is the current year it will return it in DD.MM format else it will be returned in
         DD.MM.YYYY format.
@@ -71,26 +68,28 @@ class field(empty_field):
             link = self.data_dic[self.name]["link"]
             r = requests.get(link, stream=True)
 
-            for e in r.iter_lines():
-                m = re.search(self.data_dic[self.name]["format"], e)
+            for line in r.iter_lines():
+                m = re.search(self.data_dic[self.name]["format"], line)
                 if m:
                     self.version = m.group(1)
 
-                    r2 = requests.get(self.data_dic[self.name]["date_link_beg"] + self.version + self.data_dic[self.name]["date_link_end"])
+                    r2 = requests.get(
+                        self.data_dic[self.name]["date_link_beg"] + self.version + self.data_dic[self.name][
+                            "date_link_end"])
                     for e in r2.iter_lines():
                         m2 = re.search(self.data_dic[self.name]["format2"], e)
                         if m2:
                             k = m2.group(1)
                             self.date = datetime.datetime.strptime(m2.group(1), self.data_dic[self.name]["date_format"])
-                            self.generate_table(link,self.data_dic[self.name]["date_link_beg"] + self.version + self.data_dic[self.name]["date_link_end"])
+                            self.generate_table(link, self.data_dic[self.name]["date_link_beg"] + self.version +
+                                                self.data_dic[self.name]["date_link_end"])
                             return
             raise KeyError()
         except:
             raise KeyError('ERROR: Error reading version or date: ' + self.name)
 
 
-
-    def generate_table(self,source_link,download_link=""):
+    def generate_table(self, source_link, download_link=""):
         """
         This method puts the Object to the object table and the date to the date table.
         This method is very generic and we don't provide it with exact location.
@@ -99,7 +98,7 @@ class field(empty_field):
         self.TableObj[self.soft_name] = self
         self.TableStr[self.soft_name][0] = self.return_date(self.date)
         self.TableStr[self.soft_name][2] = source_link
-        if download_link!="":
+        if download_link != "":
             self.TableStr[self.soft_name][1] = download_link
 
     def get_data_ios_beta(self):
@@ -124,11 +123,6 @@ class field(empty_field):
                         datetime.datetime.fromtimestamp(mktime(e.published_parsed))
 
 
-
-
-
-
-
         except Exception as e:
             error_mess = error_mess + "ERROR: Error reading version or date: " + self.name + " Apple RSS. "
 
@@ -141,24 +135,23 @@ class field(empty_field):
             rows = soup.find('table').find_all('tr')
             color = self.data_dic[self.name]["color"]
             for row in rows:
-                if row.find("td", {"style": "background:"+color+";"}):
-
+                if row.find("td", {"style": "background:" + color + ";"}):
                     version = row.contents[1].get_text()
                     date_string = row.contents[5].get_text().split(";")[0]
-                    date_string = unicodedata.normalize('NFKD', date_string).encode('ascii','ignore')
+                    date_string = unicodedata.normalize('NFKD', date_string).encode('ascii', 'ignore')
                     date_format_wiki = self.data_dic[self.name]["date_format_wiki"]
                     date = datetime.datetime.strptime(date_string, date_format_wiki)
-                    wiki.update({version:date})
+                    wiki.update({version: date})
             last_wiki = max(wiki.iteritems(), key=operator.itemgetter(1))
 
-            if last_wiki[1]>=self.date:
-                self.date=last_wiki[1]
+            if last_wiki[1] >= self.date:
+                self.date = last_wiki[1]
                 self.version = last_wiki[0]
                 link = link_wiki
             self.generate_table(link)
 
         except Exception as e:
-            error_mess = error_mess + "ERROR: Error reading version or date: " + self.name +  "Wikipedia. "
+            error_mess = error_mess + "ERROR: Error reading version or date: " + self.name + "Wikipedia. "
         if error_mess:
             raise Exception(error_mess)
 
@@ -173,32 +166,27 @@ class field(empty_field):
             link = self.data_dic[self.name]["link"]
             self.version = urllib2.urlopen(link).read()
 
-
             xml = urllib2.urlopen(self.data_dic[self.name]["link2"]).read()
-            soup = BeautifulSoup(xml,'xml')
+            soup = BeautifulSoup(xml, 'xml')
 
             files = []
             dates = []
 
-            for file in soup.findAll('Contents'):
-                file_name = file.find('Key').contents[0]
-                if file_name.startswith(self.version+"/chromedriver_"):
-                    files.append(file_name[len(self.version+"/chromedriver_"):])
-                    date_string = file.find('LastModified').contents[0]
-                    date = (datetime.datetime.strptime(date_string[:10],self.data_dic[self.name]["format"]))
+            for f in soup.findAll('Contents'):
+                file_name = f.find('Key').contents[0]
+                if file_name.startswith(self.version + "/chromedriver_"):
+                    files.append(file_name[len(self.version + "/chromedriver_"):])
+                    date_string = f.find('LastModified').contents[0]
+                    date = (datetime.datetime.strptime(date_string[:10], self.data_dic[self.name]["format"]))
                     dates.append(date)
-                    if file_name.startswith(self.version+"/chromedriver_win32"):
+                    if file_name.startswith(self.version + "/chromedriver_win32"):
                         self.date = date
 
-
-            self.generate_table(link,self.data_dic[self.name]["link_download"]+self.version+"/")
+            self.generate_table(link, self.data_dic[self.name]["link_download"] + self.version + "/")
 
 
         except:
             raise KeyError('ERROR: Error reading version or date: ' + self.name)
-
-
-
 
 
     def get_data_chrome(self):
@@ -214,17 +202,14 @@ class field(empty_field):
             cr = csv.reader(response)
 
             for row in cr:
-                if row[0]==self.data_dic[self.name]["os"] and row[1]==self.data_dic[self.name]["channel"]:
-                    self.version=row[2]
-                    self.date = datetime.datetime.strptime(row[4],self.data_dic[self.name]["date_format"])
-            self.generate_table(link,self.data_dic[self.name]["link_download"])
+                if row[0] == self.data_dic[self.name]["os"] and row[1] == self.data_dic[self.name]["channel"]:
+                    self.version = row[2]
+                    self.date = datetime.datetime.strptime(row[4], self.data_dic[self.name]["date_format"])
+            self.generate_table(link, self.data_dic[self.name]["link_download"])
 
 
         except:
             raise KeyError('ERROR: Error reading version or date: ' + self.name)
-
-
-
 
 
     def get_data_driver(self):
@@ -238,42 +223,35 @@ class field(empty_field):
 
             link = self.data_dic[self.name]["link"]
             xml = urllib2.urlopen(link).read()
-            soup = BeautifulSoup(xml,'xml')
+            soup = BeautifulSoup(xml, 'xml')
 
             files = {}
 
-            #We create a dictionary with all Driver files
-            for file in soup.findAll('Contents'):
-                file_name = file.find('Key').contents[0]
-                if file_name.find(self.data_dic[self.name]["text_format"])!=-1:
-                    date_string = file.find('LastModified').contents[0]
-                    date = (datetime.datetime.strptime(date_string[:10],self.data_dic[self.name]["format"]))
+            # We create a dictionary with all Driver files
+            for f in soup.findAll('Contents'):
+                file_name = f.find('Key').contents[0]
+                if file_name.find(self.data_dic[self.name]["text_format"]) != -1:
+                    date_string = f.find('LastModified').contents[0]
+                    date = (datetime.datetime.strptime(date_string[:10], self.data_dic[self.name]["format"]))
                     files[file_name] = date
 
-            #We find the most recent release
+            # We find the most recent release
             last_rel = max(files.iteritems(), key=operator.itemgetter(1))
-
-
 
             split_char = self.data_dic[self.name]["split_char"]
             split_section = self.data_dic[self.name]["split_section"]
             num_last_char = self.data_dic[self.name]["num_last_char"]
-            if num_last_char=="":
-                num_last_char=None
+            if num_last_char == "":
+                num_last_char = None
 
             self.version = last_rel[0].split(split_char)[split_section][:num_last_char]
             self.date = last_rel[1]
 
-
-
-
-
-            self.generate_table(link,self.data_dic[self.name]["link_download"]+self.version+"/")
+            self.generate_table(link, self.data_dic[self.name]["link_download"] + self.version + "/")
 
 
         except:
             raise KeyError('ERROR: Error reading version or date: ' + self.name)
-
 
 
     def get_data_selenium(self):
@@ -295,8 +273,9 @@ class field(empty_field):
 
                 if text == "Python":
                     self.version = row.contents[3].get_text()
-                    self.date = datetime.datetime.strptime(row.contents[5].get_text(), self.data_dic[self.name]["date_format"])
-                    self.generate_table(link,self.data_dic[self.name]["link2"])
+                    self.date = datetime.datetime.strptime(row.contents[5].get_text(),
+                        self.data_dic[self.name]["date_format"])
+                    self.generate_table(link, self.data_dic[self.name]["link2"])
                     return
 
             raise KeyError()
@@ -324,29 +303,22 @@ class field(empty_field):
                 b = row.contents
                 datestring = row.contents[1].get_text()
                 name = row.contents[3].get_text()
-                q = ord(datestring[2])-ord('A')
-                year = 2009+q//4
-                date = datetime.datetime(year,(q%4)*4+1,1)
-                days = int(datestring[3:5])-1
+                q = ord(datestring[2]) - ord('A')
+                year = 2009 + q // 4
+                date = datetime.datetime(year, (q % 4) * 4 + 1, 1)
+                days = int(datestring[3:5]) - 1
                 date = date + datetime.timedelta(days=days)
-                data[name]=date
+                data[name] = date
 
-            #We find the most recent release
+            # We find the most recent release
             last_rel = max(data.iteritems(), key=operator.itemgetter(1))
             self.version = last_rel[0][8:]
             self.date = last_rel[1]
-            self.generate_table(link,self.data_dic[self.name]["link2"])
+            self.generate_table(link, self.data_dic[self.name]["link2"])
 
         except Exception as e:
             print(e.message)
             raise KeyError('ERROR: Error reading version or date: ' + self.name)
-
-
-
-
-
-
-
 
 
     def get_data_apple(self):
@@ -370,7 +342,8 @@ class field(empty_field):
                 m = re.search(self.data_dic[self.name]["format"], text)
                 if m:
                     self.version = m.group(1)
-                    self.date = datetime.datetime.strptime(row.contents[4].get_text(), self.data_dic[self.name]["date_format"])
+                    self.date = datetime.datetime.strptime(row.contents[4].get_text(),
+                        self.data_dic[self.name]["date_format"])
 
                     self.generate_table(link)
                     return
@@ -380,39 +353,38 @@ class field(empty_field):
             raise KeyError('ERROR: Error reading version or date: ' + self.name)
 
 
-
     def __init__(self, name):
-
+        self.date = None
+        self.version = None
+        self.beta = None
         self.type = self.data_dic[name]["type"]
         self.name = name
         self.soft_name = self.data_dic[name]["soft_name"]
 
-        #Decides which Web-Grabbing function will be called according to the JSON file.
+        # Decides which Web-Grabbing function will be called according to the JSON file.
         try:
             self.method = self.data_dic[name]["method"]
             getattr(self, self.method)()
 
         except AttributeError as e:
-            raise Exception("Error unknown method: " + self.method +" : " + e.message)
+            raise Exception("Error unknown method: " + self.method + " : " + e.message)
         except Exception as e:
-            if type(e) == KeyError and e.message=="method":
-                raise Exception("No method field in " + self.name + " JSON entry.")
+            if type(e) == KeyError and e.message == "method":
+                raise Exception("No method Field in " + self.name + " JSON entry.")
 
             self.error_mail(e.message)
-            
 
-    def error_mail(self,messages):
+
+    def error_mail(self, messages):
         """
         Gets messages variable and decides if it's an List or String:
         In the case of list we run and send each element and send a mail.
         """
         if isinstance(messages, types.StringTypes):
-            self.send_mail(ERROR_MAIL_LIST,messages,content="")
+            self.send_mail(ERROR_MAIL_LIST, messages, content="")
         else:
             for m in messages:
-                self.send_mail(ERROR_MAIL_LIST,m,content="")
-    
-
+                self.send_mail(ERROR_MAIL_LIST, m, content="")
 
 
     @classmethod
@@ -428,32 +400,29 @@ class field(empty_field):
         client = MongoClient(DBURI)
         coll = client.test.work
         cur = coll.find_one()
-        if cur == None:
+        if not cur:
             coll.insert(cls.TableStr)
             return False
 
-
         for k1 in cls.TableStr:
-            item = cur.get(k1,[None])
-            if item[0]!=cls.TableStr[k1][0]:
+            item = cur.get(k1, [None])
+            if item[0] != cls.TableStr[k1][0]:
                 print(item[0])
-                if item[0] != None:
+                if not item[0]:
                     cls.TableObj[k1].new_release_mail()
                 coll.update({
-                },{
-                  '$set': {
-                    k1: cls.TableStr[k1]
-                  }
+                }, {
+                    '$set': {
+                        k1: cls.TableStr[k1]
+                    }
                 }, upsert=True)
                 change = True
         return change
 
 
-
-
     def send_mail(self, mails, subject, content=""):
         """
-        General Function for sending mails
+        General Method for sending mails
         """
 
         msg = MIMEText(content)
@@ -466,7 +435,6 @@ class field(empty_field):
         for mail in mails:
 
 
-
             msg['To'] = mail
             try:
                 s = smtplib.SMTP(SMTP_MAIL)
@@ -475,7 +443,7 @@ class field(empty_field):
                 s.starttls()
                 s.login(SMTP_USER, SMTP_PASS)
             except:
-                smtp_error="Error connecting" + SMTP_MAIL
+                smtp_error = "Error connecting" + SMTP_MAIL
                 break
             try:
                 s.sendmail(FROM_MAIL, mail,
@@ -495,4 +463,5 @@ class field(empty_field):
         Tries to send a mail in the wanted format. In case there is an error probably due to SMTP connection problem
         throws error. In the future it would be wise to write the message to a log file for future sending.
         """
-        self.send_mail(MAIL_LIST, ALERT_SYSTEM_NAME+': New ' + (('Beta ' if not(self.data_dic[self.name]["is_main_rel"]) else '')) + 'Release for ' + self.soft_name)
+        self.send_mail(MAIL_LIST, ALERT_SYSTEM_NAME + ': New ' + (
+            ('Beta ' if not (self.data_dic[self.name]["is_main_rel"]) else '')) + 'Release for ' + self.soft_name)

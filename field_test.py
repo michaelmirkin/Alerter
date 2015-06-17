@@ -1,6 +1,6 @@
 __author__ = 'mitik'
-from field import field
-from consts import *
-for name in field.data_dic:
-    field(name)
-field.load_and_compare()
+from field import Field
+
+for name in Field.data_dic:
+    Field(name)
+Field.load_and_compare()
