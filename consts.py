@@ -2,7 +2,7 @@ FROM_MAIL = 'test@test.com'
 SMTP_MAIL = 'smtp.gmail.com:587'
 SMTP_USER = 'yotamproject'
 SMTP_PASS = 'Tirasham'
-
+ALERT_SYSTEM_NAME = "SOFTWARE ALERT SYSTEM"
 
 
 JSON_NAME = 'sources.json'

@@ -4,14 +4,24 @@ import tornado.log
 import tornado.web
 from pymongo import MongoClient
 from field import field
+import datetime
 from time import gmtime, strftime
 from consts import DBURI, HTML_NAME, WAITING_TIME_SEC, JSON_NAME
+import collections
 
 
 class MainHandler(tornado.web.RequestHandler):
-    client = MongoClient(DBURI)
 
-    listfield = {val["soft_name"] for el,val in field.data_dic.iteritems()}
+    @classmethod
+    def set_dict(cls,list):
+        cls.listfield = list
+
+    def initialize(self):
+        self.client = MongoClient(DBURI)
+
+        super(MainHandler,self).initialize()
+
+
 
     def readDB(self):
         coll = self.client.test.work
@@ -26,8 +36,12 @@ class MainHandler(tornado.web.RequestHandler):
 
 
     def get(self):
+
         TableStr = self.readDB()
-        self.render(HTML_NAME, TableStr=TableStr, listFields=self.listfield)
+        today = datetime.datetime.now()
+        today_str = str(today.day)+"."+str(today.month)
+
+        self.render(HTML_NAME, TableStr=TableStr, listFields=self.listfield,today_date=today_str)
 
 
 
@@ -46,6 +60,13 @@ def check_updates():
         print(strftime("%Y-%m-%d, %H:%M:%S: ", gmtime()) + "End of update: There was an update\n")
     else:
         print(strftime("%Y-%m-%d, %H:%M:%S: ", gmtime()) + "End of update: No update\n")
+    listfield = list()
+    for el,val in field.data_dic.iteritems():
+        listfield.append(val["soft_name"])
+
+    MainHandler.set_dict(listfield)
+
+
 
 
 

@@ -2,15 +2,22 @@
     "ios beta": {
         "format": "iOS\\s(.+?)\\sbeta\\s(.+?)\\s+.",
         "link": "https://developer.apple.com/news/rss/news.rss",
-        "soft_name": "iOS",
+        "link_wiki": "http://en.wikipedia.org/wiki/History_of_iOS",
+        "soft_name": "iOS Beta",
+        "is_main_rel": 0,
+        "color": "#2fc0ff",
+        "date_format_wiki": "%B %d, %Y",
+        "method": "get_data_ios_beta",
         "type": "rss"
     },
 
     "ios official": {
         "link": "https://support.apple.com/en-us/HT201222",
         "type": "html_table_apple",
+        "method": "get_data_apple",
         "format": "iOS.+?(\\d.+?\\d)",
         "soft_name": "iOS",
+        "is_main_rel": 1,
         "date_format": "%d %b %Y"
 
     },
@@ -20,7 +27,9 @@
         "link": "http://www.seleniumhq.org/download/",
         "link2": "http://pypi.python.org/pypi/selenium",
         "type": "html_table_selenium",
+        "method": "get_data_selenium",
         "soft_name": "Selenium",
+        "is_main_rel": 1,
         "date_format": "%Y-%m-%d"
 
     },
@@ -28,7 +37,9 @@
         "link": "http://source.android.com/source/build-numbers.html",
         "link2": "http://source.android.com/source/build-numbers.html",
         "type": "html_table_android",
+        "method": "get_data_android",
         "soft_name": "Android",
+        "is_main_rel": 1,
         "date_format": "%Y-%m-%d"
 
     },
@@ -36,8 +47,10 @@
     "safari official": {
         "link": "https://support.apple.com/en-us/HT201222",
         "type": "html_table_apple",
+        "method": "get_data_apple",
         "format": "Safari.+?(\\d.+?\\d)($|,)",
         "soft_name": "Safari",
+        "is_main_rel": 1,
         "date_format": "%d %b %Y"
 
     },
@@ -48,7 +61,9 @@
         "date_link_beg": "http://www.mozilla.org/en-US/firefox/",
         "date_link_end": "/releasenotes/",
         "type": "hidden_in_html_source",
+        "method": "get_data_firefox",
         "soft_name": "Firefox",
+        "is_main_rel": 1,
         "date_format": "%B %d, %Y"
 
     },
@@ -58,8 +73,10 @@
         "os": "win",
         "channel": "stable",
         "type": "csv",
+        "method": "get_data_chrome",
         "soft_name": "Chrome",
         "date_format": "%m/%d/%y",
+        "is_main_rel": 1,
         "link_download": "https://www.chromium.org/getting-involved/dev-channel"
 
     },
@@ -69,10 +86,11 @@
         "os": "android",
         "channel": "stable",
         "type": "csv",
+        "method": "get_data_chrome",
         "soft_name": "Chrome browser for android",
         "date_format": "%m/%d/%y",
+        "is_main_rel": 1,
         "link_download": ""
-
     },
 
     "chrome webdrive": {
@@ -81,6 +99,8 @@
         "link_download": "http://chromedriver.storage.googleapis.com/index.html?path=",
         "format": "%Y-%m-%d",
         "type": "plain_file",
+        "method": "get_data_chrome_driver",
+        "is_main_rel": 1,
         "soft_name": "Selenium Chrome webdriver",
         "date_format": "%B %d, %Y"
 
@@ -90,8 +110,13 @@
         "link_download": "http://selenium-release.storage.googleapis.com/index.html?path=",
         "format": "%Y-%m-%d",
         "type": "plain_file_without_latest",
+        "method": "get_data_driver",
         "soft_name": "Selenium IE webdriver",
         "text_format": "IEDriverServer",
+        "is_main_rel": 1,
+        "split_char": "_",
+        "split_section": 2,
+        "num_last_char":-6,
         "date_format": "%B %d, %Y"
 
     },
@@ -99,9 +124,31 @@
         "link": "http://selenium-release.storage.googleapis.com/",
         "link_download": "http://selenium-release.storage.googleapis.com/index.html?path=",
         "format": "%Y-%m-%d",
-        "type": "plain_file_without_latest_folder",
+        "type": "plain_file_without_latest",
+        "method": "get_data_driver",
         "soft_name": "Selenium Driver Folder",
         "text_format": "/",
+        "is_main_rel": 1,
+        "split_char": "/",
+        "split_section": 0,
+        "num_last_char": "",
+
+        "date_format": "%B %d, %Y"
+
+    },
+    "safari": {
+        "link": "http://selenium-release.storage.googleapis.com/",
+        "link_download": "http://selenium-release.storage.googleapis.com/index.html?path=",
+        "format": "%Y-%m-%d",
+        "type": "plain_file_without_latest",
+        "method": "get_data_driver",
+        "soft_name": "Safari Selenium Driver",
+        "text_format": "Safari",
+        "is_main_rel": 1,
+        "split_char": "/",
+        "split_section": 0,
+        "num_last_char": "",
+
         "date_format": "%B %d, %Y"
 
     }

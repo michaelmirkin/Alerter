@@ -1,6 +1,6 @@
 feedparser
 requests
-requests[security]
 BeautifulSoup
 MongoClient
 tornado
+lxml
