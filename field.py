@@ -65,8 +65,8 @@ class Field(EmptyField):
 
     def get_data_firefox(self):
         try:
-            link = self.data_dic[self.name]["link"]
-            r = requests.get(link, stream=True)
+            self.link = self.data_dic[self.name]["link"]
+            r = requests.get(self.link, stream=True)
 
             for line in r.iter_lines():
                 m = re.search(self.data_dic[self.name]["format"], line)
@@ -81,7 +81,7 @@ class Field(EmptyField):
                         if m2:
                             k = m2.group(1)
                             self.date = datetime.datetime.strptime(m2.group(1), self.data_dic[self.name]["date_format"])
-                            self.generate_table(link, self.data_dic[self.name]["date_link_beg"] + self.version +
+                            self.generate_table(self.link, self.data_dic[self.name]["date_link_beg"] + self.version +
                                                 self.data_dic[self.name]["date_link_end"])
                             return
             raise KeyError()
@@ -111,8 +111,8 @@ class Field(EmptyField):
         """
         error_mess = ""
         try:
-            link = self.data_dic[self.name]["link"]
-            d = feedparser.parse(link)
+            self.link = self.data_dic[self.name]["link"]
+            d = feedparser.parse(self.link)
 
             for e in d.entries:
                 m = re.search(self.data_dic[self.name]["format"], e.title)
@@ -147,13 +147,13 @@ class Field(EmptyField):
             if last_wiki[1] >= self.date:
                 self.date = last_wiki[1]
                 self.version = last_wiki[0]
-                link = link_wiki
-            self.generate_table(link)
+                self.link = link_wiki
+            self.generate_table(self.link)
 
         except Exception as e:
             error_mess = error_mess + "ERROR: Error reading version or date: " + self.name + "Wikipedia. "
         if error_mess:
-            raise Exception(error_mess)
+            raise KeyError(error_mess)
 
     def get_data_chrome_driver(self):
         """
@@ -163,8 +163,8 @@ class Field(EmptyField):
         :return:
         """
         try:
-            link = self.data_dic[self.name]["link"]
-            self.version = urllib2.urlopen(link).read()
+            self.link = self.data_dic[self.name]["link"]
+            self.version = urllib2.urlopen(self.link).read()
 
             xml = urllib2.urlopen(self.data_dic[self.name]["link2"]).read()
             soup = BeautifulSoup(xml, 'xml')
@@ -182,7 +182,7 @@ class Field(EmptyField):
                     if file_name.startswith(self.version + "/chromedriver_win32"):
                         self.date = date
 
-            self.generate_table(link, self.data_dic[self.name]["link_download"] + self.version + "/")
+            self.generate_table(self.link, self.data_dic[self.name]["link_download"] + self.version + "/")
 
 
         except:
@@ -197,15 +197,15 @@ class Field(EmptyField):
         """
         try:
 
-            link = self.data_dic[self.name]["link"]
-            response = urllib2.urlopen(link)
+            self.link = self.data_dic[self.name]["link"]
+            response = urllib2.urlopen(self.link)
             cr = csv.reader(response)
 
             for row in cr:
                 if row[0] == self.data_dic[self.name]["os"] and row[1] == self.data_dic[self.name]["channel"]:
                     self.version = row[2]
                     self.date = datetime.datetime.strptime(row[4], self.data_dic[self.name]["date_format"])
-            self.generate_table(link, self.data_dic[self.name]["link_download"])
+            self.generate_table(self.link, self.data_dic[self.name]["link_download"])
 
 
         except:
@@ -221,8 +221,8 @@ class Field(EmptyField):
         """
         try:
 
-            link = self.data_dic[self.name]["link"]
-            xml = urllib2.urlopen(link).read()
+            self.link = self.data_dic[self.name]["link"]
+            xml = urllib2.urlopen(self.link).read()
             soup = BeautifulSoup(xml, 'xml')
 
             files = {}
@@ -247,7 +247,7 @@ class Field(EmptyField):
             self.version = last_rel[0].split(split_char)[split_section][:num_last_char]
             self.date = last_rel[1]
 
-            self.generate_table(link, self.data_dic[self.name]["link_download"] + self.version + "/")
+            self.generate_table(self.link, self.data_dic[self.name]["link_download"] + self.version + "/")
 
 
         except:
@@ -262,8 +262,8 @@ class Field(EmptyField):
         :return:
         """
         try:
-            link = self.data_dic[self.name]["link"]
-            html = urllib2.urlopen(link).read()
+            self.link = self.data_dic[self.name]["link"]
+            html = urllib2.urlopen(self.link).read()
             soup = BeautifulSoup(html)
             soup.prettify()
 
@@ -275,7 +275,7 @@ class Field(EmptyField):
                     self.version = row.contents[3].get_text()
                     self.date = datetime.datetime.strptime(row.contents[5].get_text(),
                         self.data_dic[self.name]["date_format"])
-                    self.generate_table(link, self.data_dic[self.name]["link2"])
+                    self.generate_table(self.link, self.data_dic[self.name]["link2"])
                     return
 
             raise KeyError()
@@ -293,8 +293,8 @@ class Field(EmptyField):
         """
         data = {}
         try:
-            link = self.data_dic[self.name]["link"]
-            html = urllib2.urlopen(link).read()
+            self.link = self.data_dic[self.name]["link"]
+            html = urllib2.urlopen(self.link).read()
             soup = BeautifulSoup(html)
             soup.prettify()
 
@@ -314,7 +314,7 @@ class Field(EmptyField):
             last_rel = max(data.iteritems(), key=operator.itemgetter(1))
             self.version = last_rel[0][8:]
             self.date = last_rel[1]
-            self.generate_table(link, self.data_dic[self.name]["link2"])
+            self.generate_table(self.link, self.data_dic[self.name]["link2"])
 
         except Exception as e:
             print(e.message)
@@ -329,9 +329,9 @@ class Field(EmptyField):
         :return:
         """
         try:
-            link = self.data_dic[self.name]["link"]
+            self.link = self.data_dic[self.name]["link"]
 
-            html = urllib2.urlopen(link).read()
+            html = urllib2.urlopen(self.link).read()
             soup = BeautifulSoup(html)
             soup.prettify()
 
@@ -345,7 +345,7 @@ class Field(EmptyField):
                     self.date = datetime.datetime.strptime(row.contents[4].get_text(),
                         self.data_dic[self.name]["date_format"])
 
-                    self.generate_table(link)
+                    self.generate_table(self.link)
                     return
 
             raise KeyError()
@@ -368,7 +368,7 @@ class Field(EmptyField):
 
         except AttributeError as e:
             raise Exception("Error unknown method: " + self.method + " : " + e.message)
-        except Exception as e:
+        except KeyError as e:
             if type(e) == KeyError and e.message == "method":
                 raise Exception("No method Field in " + self.name + " JSON entry.")
 
@@ -384,7 +384,7 @@ class Field(EmptyField):
             self.send_mail(ERROR_MAIL_LIST, messages, content="")
         else:
             for m in messages:
-                self.send_mail(ERROR_MAIL_LIST, m, content="")
+                self.send_mail(ERROR_MAIL_LIST, m, FORMAT% self.link)
 
 
     @classmethod
@@ -407,8 +407,7 @@ class Field(EmptyField):
         for k1 in cls.TableStr:
             item = cur.get(k1, [None])
             if item[0] != cls.TableStr[k1][0]:
-                print(item[0])
-                if not item[0]:
+                if item[0]:
                     cls.TableObj[k1].new_release_mail()
                 coll.update({
                 }, {
@@ -464,4 +463,7 @@ class Field(EmptyField):
         throws error. In the future it would be wise to write the message to a log file for future sending.
         """
         self.send_mail(MAIL_LIST, ALERT_SYSTEM_NAME + ': New ' + (
-            ('Beta ' if not (self.data_dic[self.name]["is_main_rel"]) else '')) + 'Release for ' + self.soft_name)
+            ('Beta ' if not (self.data_dic[self.name]["is_main_rel"]) else '')) + 'Release for ' + self.soft_name,
+                     FORMAT% self.link
+                     )
+

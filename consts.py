@@ -7,9 +7,11 @@ ALERT_SYSTEM_NAME = "SOFTWARE ALERT SYSTEM"
 JSON_NAME = 'sources.json'
 HTML_NAME = 'info.html'
 DBURI = 'mongodb://localhost:27017/'
+TORNADO_URL = "http://localhost:8888"
+FORMAT = "Link to table: "+TORNADO_URL+"\n\n"+"Link to source: %s"
+
 
 MAIL_LIST = ["michael.mirkin@gmail.com",
-             "danscwarz@gmail.com",
              ]
 
 ERROR_MAIL_LIST = ["michael.mirkin@gmail.com",

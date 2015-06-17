@@ -39,9 +39,7 @@ class MainHandler(tornado.web.RequestHandler):
         self.render(HTML_NAME, TableStr=tablestr, listFields=self.listfield, today_date=today_str)
 
 
-application = tornado.web.Application([
-    (r"/", MainHandler),
-])
+
 
 
 def check_updates():
@@ -61,6 +59,9 @@ def check_updates():
 
 
 if __name__ == "__main__":
+    application = tornado.web.Application([
+    (r"/", MainHandler),
+    ])
     application.listen(8888)
 
     check_updates()
