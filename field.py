@@ -12,7 +12,9 @@ import smtplib
 from email.mime.text import MIMEText
 import json
 import requests
+# NOTICE we prefer constants in the local_settings over these in consts
 from consts import *
+from local_settings import *
 import operator
 import csv
 import types
@@ -426,7 +428,7 @@ class Field(EmptyField):
         """
         change = False
         client = MongoClient(DBURI)
-        coll = client.test.work
+        coll = client.db.alerter
         cur = coll.find_one()
         if not cur:
             coll.insert(cls.TableStr)
