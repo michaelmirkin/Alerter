@@ -428,7 +428,7 @@ class Field(EmptyField):
         """
         change = False
         client = MongoClient(DBURI)
-        coll = client.db.alerter
+        coll = client[DB_NAME].alerter
         cur = coll.find_one()
         if not cur:
             coll.insert(cls.TableStr)

@@ -6,6 +6,7 @@ ALERT_SYSTEM_NAME = "SOFTWARE ALERT SYSTEM"
 
 JSON_NAME = 'sources.json'
 HTML_NAME = 'info.html'
+DB_NAME = "test"
 DBURI = 'mongodb://localhost:27017/'
 TORNADO_URL = "http://localhost:8888"
 FORMAT = "Link to table: "+TORNADO_URL+"\n\n"+"Link to source: %s"
