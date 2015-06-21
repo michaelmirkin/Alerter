@@ -1,6 +1,6 @@
 feedparser
 requests
 BeautifulSoup
-MongoClient
+pymongo
 tornado
 lxml
