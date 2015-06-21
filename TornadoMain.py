@@ -6,7 +6,9 @@ from pymongo import MongoClient
 from field import Field
 import datetime
 from time import gmtime, strftime
+# NOTICE we prefer local_settings over consts
 from consts import DBURI, HTML_NAME, WAITING_TIME_SEC
+from local_settings import *
 import collections
 import threading
 

@@ -1,6 +1,6 @@
 feedparser
 requests
-BeautifulSoup
+BeautifulSoup4
 pymongo
 tornado
 lxml
