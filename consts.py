@@ -12,11 +12,10 @@ TORNADO_URL = "http://localhost:8888"
 FORMAT = "Link to table: "+TORNADO_URL+"\n\n"+"Link to source: %s"
 
 
-MAIL_LIST = ["michael.mirkin@gmail.com",
+MAIL_LIST = ["yotamg@similarweb.com"
              ]
 
-ERROR_MAIL_LIST = ["michael.mirkin@gmail.com",
-                   "danscwarz@gmail.com",
+ERROR_MAIL_LIST = ["yotamg@similarweb.com"
                    ]
 
 WAITING_TIME_HOURS = 1

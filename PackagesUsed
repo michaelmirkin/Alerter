@@ -4,3 +4,6 @@ BeautifulSoup4
 pymongo
 tornado
 lxml
+sudo apt-get install python-dev
+sudo apt-get install libxml2-dev libxslt1-dev
+sudo apt-get install lib32z1-dev

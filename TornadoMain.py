@@ -24,7 +24,7 @@ class MainHandler(tornado.web.RequestHandler):
         super(MainHandler, self).initialize()
 
     def readdb(self):
-        coll = self.client.test.work
+        coll = self.client[DB_NAME].alerter
         cur = coll.find()
         if cur.count() == 0:
             raise KeyError('The DB seems to be empty')
@@ -72,7 +72,8 @@ if __name__ == "__main__":
     application = tornado.web.Application([
     (r"/", MainHandler),
     ])
-    application.listen(8888)
+    print "Opening port 6666"
+    application.listen(6666)
 
     check_updates()
     task = tornado.ioloop.PeriodicCallback(check_updates, WAITING_TIME_SEC * 1000)
